@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"mutating-trace-admission-controller/pkg/util/patch"
+	"mutating-trace-admission-controller/pkg/patch"
 	"net/http"
 
 	"github.com/golang/glog"
