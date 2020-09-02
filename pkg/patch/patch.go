@@ -91,14 +91,19 @@ func updateAnnotation(target, added map[string]string) (patch []patchOperation) 
 			Path:  "/metadata/annotations",
 			Value: make(map[string]string, 0),
 		}
-		patchReplace []patchOperation = make([]patchOperation, 0)
 	)
 
 	for key, value := range added {
-		if target == nil || target[key] == "" {
+		if target == nil {
 			patchAdd.Value.(map[string]string)[key] = value
-		} else {
-			patchReplace = append(patchReplace, patchOperation{
+		} else if target[key] == "" {
+			patch = append(patch, patchOperation{
+				Op:    "add",
+				Path:  "/metadata/annotations/" + key,
+				Value: value,
+			})
+		} else if target[key] != value {
+			patch = append(patch, patchOperation{
 				Op:    "replace",
 				Path:  "/metadata/annotations/" + key,
 				Value: value,
@@ -108,9 +113,6 @@ func updateAnnotation(target, added map[string]string) (patch []patchOperation) 
 
 	if len(patchAdd.Value.(map[string]string)) != 0 {
 		patch = append(patch, patchAdd)
-	}
-	if len(patchReplace) != 0 {
-		patch = append(patch, patchReplace...)
 	}
 
 	return patch
