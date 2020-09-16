@@ -6,6 +6,7 @@ pipeline {
                 sh 'make test-unit'
                 sh 'make build'
                 sh 'make docker'
+		sh 'echo "hello world"'
             }
         }
     }
