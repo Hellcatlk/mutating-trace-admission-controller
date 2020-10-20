@@ -1,6 +1,9 @@
 package patch
 
-import "encoding/json"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 // PatchOperation ...
 type PatchOperation struct {
@@ -11,6 +14,10 @@ type PatchOperation struct {
 
 // BuildAnnotationsPatch create patch for annotations
 func BuildAnnotationsPatch(old, new map[string]string) (patch []PatchOperation) {
+	fmt.Println("-------------------------------------")
+	fmt.Println(old)
+	fmt.Println(new)
+	fmt.Println("-------------------------------------")
 	var (
 		patchAdd PatchOperation = PatchOperation{
 			Op:    "add",

@@ -7,7 +7,9 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/niemeyer/pretty v0.0.0-20200227124842-a10e7caefd8e // indirect
 	go.opentelemetry.io/otel v0.13.0
-	golang.org/x/net v0.0.0-20201009032441-dbdefad45b89 // indirect
+	go.opentelemetry.io/otel/exporters/stdout v0.13.0
+	go.opentelemetry.io/otel/sdk v0.13.0
+	golang.org/x/net v0.0.0-20201020065357-d65d470038a5 // indirect
 	gopkg.in/check.v1 v1.0.0-20200902074654-038fdea0a05b // indirect
 	gopkg.in/yaml.v2 v2.3.0
 	k8s.io/api v0.19.2

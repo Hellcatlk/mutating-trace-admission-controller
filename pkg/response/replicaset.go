@@ -3,6 +3,7 @@ package response
 import (
 	"encoding/json"
 	"mutating-trace-admission-controller/pkg/util/patch"
+	"mutating-trace-admission-controller/pkg/util/trace"
 
 	"github.com/golang/glog"
 	"k8s.io/api/admission/v1beta1"
@@ -10,7 +11,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func buildReplicaSetPatch(raw []byte, patchAnnotations map[string]string) *v1beta1.AdmissionResponse {
+func buildReplicaSetPatch(raw []byte, op v1beta1.Operation) *v1beta1.AdmissionResponse {
 	var replicaSet appv1.ReplicaSet
 	err := json.Unmarshal(raw, &replicaSet)
 	if err != nil {
@@ -26,6 +27,37 @@ func buildReplicaSetPatch(raw []byte, patchAnnotations map[string]string) *v1bet
 	if replicaSet.OwnerReferences != nil {
 		return &v1beta1.AdmissionResponse{
 			Allowed: true,
+		}
+	}
+
+	// create or update span context
+	spanContext, err := trace.DecodeSpanContext(replicaSet.GetAnnotations()[spanContextAnnotationKey])
+	if err != nil {
+		return &v1beta1.AdmissionResponse{
+			Result: &metav1.Status{
+				Message: err.Error(),
+			},
+		}
+	}
+	spanContext = trace.StartSpan(spanContext)
+
+	// create initial trace id
+	inititalTraceID := ""
+	if op == v1beta1.Create {
+		if replicaSet.GetAnnotations()[initialTraceIDAnnotationKey] != "" {
+			inititalTraceID = replicaSet.GetAnnotations()[initialTraceIDAnnotationKey]
+		} else {
+			inititalTraceID = spanContext.TraceID.String()
+		}
+	}
+
+	// create patch annotations
+	patchAnnotations, err := buildAnnotations(inititalTraceID, spanContext)
+	if err != nil {
+		return &v1beta1.AdmissionResponse{
+			Result: &metav1.Status{
+				Message: err.Error(),
+			},
 		}
 	}
 

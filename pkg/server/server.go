@@ -61,7 +61,7 @@ func (whsvr *WebhookServer) Serve(w http.ResponseWriter, r *http.Request) {
 
 	// build response
 	admissionReview := v1beta1.AdmissionReview{}
-	admissionReview.Response = response.BuildResponse(r, &ar)
+	admissionReview.Response = response.Build(r, &ar)
 
 	// marshal respson
 	resp, err := json.Marshal(admissionReview)

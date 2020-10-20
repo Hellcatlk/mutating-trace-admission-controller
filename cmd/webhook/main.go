@@ -11,6 +11,7 @@ import (
 
 	"mutating-trace-admission-controller/pkg/config"
 	"mutating-trace-admission-controller/pkg/server"
+	"mutating-trace-admission-controller/pkg/util/trace"
 
 	"github.com/golang/glog"
 )
@@ -34,6 +35,10 @@ func main() {
 		glog.Errorf("load X509 key pair failed: %v", err)
 		return
 	}
+
+	// initial tracer
+	shutdown := trace.InitTracer()
+	defer shutdown()
 
 	// config webhook server
 	whsvr := &server.WebhookServer{
