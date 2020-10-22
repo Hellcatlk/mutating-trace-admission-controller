@@ -10,16 +10,14 @@
 
 ### Kubernetes
 
-First of all, we need a kubernetes(v1.18.5+) cluster, a single-node cluster will make the next job easier.
+First of all, we need a kubernetes(v1.19.0+) cluster, a single-node cluster will make the next job easier.
 
 Use our `kube-apiserver` and `kube-controller-manger` instead of them in cluster:
 
-1. Clone the source code from [here](https://github.com/Hellcatlk/kubernetes/tree/trace-ot).
+1. Clone the source code from [here](https://github.com/Hellcatlk/kubernetes/tree/trace-noapiserver).
 2. Run `KUBE_BUILD_PLATFORMS=linux/amd64 KUBE_BUILD_CONFORMANCE=n KUBE_BUILD_HYPERKUBE=n make release-images`.
-3. Run `docker load -i _output/release-images/amd64/kube-apiserver.tar`.
-4. Run `docker load -i _output/release-images/amd64/kube-controller-manager.tar`.
-5. Edit `/etc/kubernetes/manifests/kube-apiserver.yaml`, use our `kube-apiserver image` instead of old image.
-6. Edit `/etc/kubernetes/manifests/kube-controller-manager.yaml`, use our `kube-controller-manager image` instead of old image.
+3. Run `docker load -i _output/release-images/amd64/kube-controller-manager.tar`.
+4. Edit `/etc/kubernetes/manifests/kube-controller-manager.yaml`, use our `kube-controller-manager image` instead of old image.
 
 ### Webhook
 
