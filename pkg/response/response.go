@@ -1,6 +1,7 @@
 package response
 
 import (
+	"fmt"
 	"net/http"
 
 	"k8s.io/api/admission/v1beta1"
@@ -18,6 +19,10 @@ const spanContextAnnotationKey string = "trace.kubernetes.io.span.context"
 
 // Build build the response to inject the trace context into received object
 func Build(r *http.Request, ar *v1beta1.AdmissionReview) (response *v1beta1.AdmissionResponse) {
+
+	fmt.Println("--------------------------------------")
+	fmt.Printf("Kind: %v, Operation: %v\n", ar.Request.Kind.Kind, ar.Request.Operation)
+
 	switch ar.Request.Kind.Kind {
 	case "Deployment":
 		response = buildDeploymentPatch(ar.Request.Object.Raw, ar.Request.Operation)
@@ -41,6 +46,11 @@ func Build(r *http.Request, ar *v1beta1.AdmissionReview) (response *v1beta1.Admi
 
 // buildAnnotations create a annotation with initTraceID and span
 func buildAnnotations(initTraceID string, spanContext apitrace.SpanContext) (map[string]string, error) {
+
+	fmt.Printf("InitialTraceID: %v\n", initTraceID)
+	fmt.Printf("SpanContext: %v\n", spanContext)
+	fmt.Println("--------------------------------------")
+
 	encodedSpanContext, err := trace.EncodedSpanContext(spanContext)
 	if err != nil {
 		return nil, err
