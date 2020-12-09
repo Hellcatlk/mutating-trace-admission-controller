@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func buildPodPatch(raw []byte, patchAnnotations map[string]string) *v1beta1.AdmissionResponse {
+func buildPodPatch(raw []byte, newAnnotations map[string]string) *v1beta1.AdmissionResponse {
 	var pod corev1.Pod
 	err := json.Unmarshal(raw, &pod)
 	if err != nil {
@@ -22,7 +22,7 @@ func buildPodPatch(raw []byte, patchAnnotations map[string]string) *v1beta1.Admi
 		}
 	}
 
-	patchBytes, err := patch.EncodePatch(patch.BuildAnnotationsPatch(pod.Annotations, patchAnnotations))
+	patchBytes, err := patch.Encode(patch.WithAnnotations(pod.Annotations, newAnnotations))
 	if err != nil {
 		glog.Errorf("encode pod patch failed: %v", err)
 		return &v1beta1.AdmissionResponse{

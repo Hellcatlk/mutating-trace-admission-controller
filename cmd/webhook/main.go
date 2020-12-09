@@ -61,5 +61,8 @@ func main() {
 	<-signalChan
 
 	// shutdown webhook server
-	whsvr.Server.Shutdown(context.Background())
+	err = whsvr.Server.Shutdown(context.Background())
+	if err != nil {
+		glog.Error(err)
+	}
 }

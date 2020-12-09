@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func buildDeploymentPatch(raw []byte, patchAnnotations map[string]string) *v1beta1.AdmissionResponse {
+func buildDeploymentPatch(raw []byte, newAnnotations map[string]string) *v1beta1.AdmissionResponse {
 	var deployment appv1.Deployment
 	err := json.Unmarshal(raw, &deployment)
 	if err != nil {
@@ -22,7 +22,7 @@ func buildDeploymentPatch(raw []byte, patchAnnotations map[string]string) *v1bet
 		}
 	}
 
-	patchBytes, err := patch.EncodePatch(patch.BuildAnnotationsPatch(deployment.Annotations, patchAnnotations))
+	patchBytes, err := patch.Encode(patch.WithAnnotations(deployment.Annotations, newAnnotations))
 	if err != nil {
 		glog.Errorf("encode deployment patch failed: %v", err)
 		return &v1beta1.AdmissionResponse{

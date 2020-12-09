@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 
 	"github.com/golang/glog"
 	yaml "gopkg.in/yaml.v2"
@@ -38,17 +39,20 @@ func ParseConfig(path string) (Config, error) {
 		glog.Warningf("config path is empty, use default:: %v", defaultConfigPath)
 		path = defaultConfigPath
 	}
+
 	// read config file
-	configYaml, err := ioutil.ReadFile(path)
+	configYaml, err := ioutil.ReadFile(filepath.Clean(path))
 	if err != nil {
 		return Config{}, fmt.Errorf("could not read YAML configuration file: %v", err)
 	}
+
 	// parse config yaml
 	var config Config
 	err = yaml.Unmarshal(configYaml, &config)
 	if err != nil {
 		return Config{}, fmt.Errorf("could not umarshal YAML configuration file: %v", err)
 	}
+
 	// validate config
 	if config.Trace.SampleRate < 0 || config.Trace.SampleRate > 1 {
 		return Config{}, errors.New("sampling rate must be between 0 and 1 inclusive")
@@ -61,6 +65,7 @@ func ParseConfig(path string) (Config, error) {
 		glog.Warningf("key path is empty, use default: %v", defaultKeyPath)
 		config.Certificate.KeyPath = defaultKeyPath
 	}
+
 	return config, nil
 }
 

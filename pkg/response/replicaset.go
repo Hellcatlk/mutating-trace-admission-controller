@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func buildReplicaSetPatch(raw []byte, patchAnnotations map[string]string) *v1beta1.AdmissionResponse {
+func buildReplicaSetPatch(raw []byte, newAnnotations map[string]string) *v1beta1.AdmissionResponse {
 	var replicaSet appv1.ReplicaSet
 	err := json.Unmarshal(raw, &replicaSet)
 	if err != nil {
@@ -29,7 +29,7 @@ func buildReplicaSetPatch(raw []byte, patchAnnotations map[string]string) *v1bet
 		}
 	}
 
-	patchBytes, err := patch.EncodePatch(patch.BuildAnnotationsPatch(replicaSet.Annotations, patchAnnotations))
+	patchBytes, err := patch.Encode(patch.WithAnnotations(replicaSet.Annotations, newAnnotations))
 	if err != nil {
 		glog.Errorf("encode replicaset patch failed: %v", err)
 		return &v1beta1.AdmissionResponse{

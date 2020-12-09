@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func buildDeamonSetPatch(raw []byte, patchAnnotations map[string]string) *v1beta1.AdmissionResponse {
+func buildDeamonSetPatch(raw []byte, newAnnotations map[string]string) *v1beta1.AdmissionResponse {
 	var deamonSet appv1.DaemonSet
 	err := json.Unmarshal(raw, &deamonSet)
 	if err != nil {
@@ -22,7 +22,7 @@ func buildDeamonSetPatch(raw []byte, patchAnnotations map[string]string) *v1beta
 		}
 	}
 
-	patchBytes, err := patch.EncodePatch(patch.BuildAnnotationsPatch(deamonSet.Annotations, patchAnnotations))
+	patchBytes, err := patch.Encode(patch.WithAnnotations(deamonSet.Annotations, newAnnotations))
 	if err != nil {
 		glog.Errorf("encode deamonset patch failed: %v", err)
 		return &v1beta1.AdmissionResponse{

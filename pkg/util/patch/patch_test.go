@@ -10,7 +10,7 @@ func TestAnnotationsPatch(t *testing.T) {
 		name     string
 		new      map[string]string
 		old      map[string]string
-		expected []PatchOperation
+		expected []Operation
 	}{
 		{
 			name: "old is nil",
@@ -18,7 +18,7 @@ func TestAnnotationsPatch(t *testing.T) {
 				"k1": "1",
 				"k2": "2",
 			},
-			expected: []PatchOperation{
+			expected: []Operation{
 				{
 					Op:   "add",
 					Path: "/metadata/annotations",
@@ -36,7 +36,7 @@ func TestAnnotationsPatch(t *testing.T) {
 				"k1": "1",
 				"k2": "2",
 			},
-			expected: []PatchOperation{
+			expected: []Operation{
 				{
 					Op:    "add",
 					Path:  "/metadata/annotations/k1",
@@ -59,7 +59,7 @@ func TestAnnotationsPatch(t *testing.T) {
 				"k1": "1",
 				"k2": "2",
 			},
-			expected: []PatchOperation{
+			expected: []Operation{
 				{
 					Op:    "replace",
 					Path:  "/metadata/annotations/k1",
@@ -70,7 +70,7 @@ func TestAnnotationsPatch(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			got := BuildAnnotationsPatch(c.old, c.new)
+			got := WithAnnotations(c.old, c.new)
 			if !reflect.DeepEqual(c.expected, got) {
 				t.Errorf("expected: %v, got: %v", c.expected, got)
 			}

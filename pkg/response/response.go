@@ -17,8 +17,8 @@ const initialTraceIDAnnotationKey string = "trace.kubernetes.io.initial"
 // avoid use char `/` in string
 const spanContextAnnotationKey string = "trace.kubernetes.io.span.context"
 
-// BuildResponse build the response to inject the trace context into received object
-func BuildResponse(r *http.Request, ar *v1beta1.AdmissionReview) (response *v1beta1.AdmissionResponse) {
+// Build the response to inject the trace context into received object
+func Build(r *http.Request, ar *v1beta1.AdmissionReview) (response *v1beta1.AdmissionResponse) {
 	fmt.Println("-------------------------------------")
 	fmt.Println(r.Header)
 	fmt.Println(ar.Request.Operation)
@@ -40,8 +40,8 @@ func BuildResponse(r *http.Request, ar *v1beta1.AdmissionReview) (response *v1be
 	}
 
 	// build the annotations to patch
-	patchAnnotations, err := buildAnnotations(initialTraceID, spanContext)
-	if len(patchAnnotations) == 0 || err != nil {
+	newAnnotations, err := buildAnnotations(initialTraceID, spanContext)
+	if len(newAnnotations) == 0 || err != nil {
 		return &v1beta1.AdmissionResponse{
 			UID:     ar.Request.UID,
 			Allowed: true,
@@ -50,15 +50,15 @@ func BuildResponse(r *http.Request, ar *v1beta1.AdmissionReview) (response *v1be
 
 	switch ar.Request.Kind.Kind {
 	case "Deployment":
-		response = buildDeploymentPatch(ar.Request.Object.Raw, patchAnnotations)
+		response = buildDeploymentPatch(ar.Request.Object.Raw, newAnnotations)
 	case "DeamonSet":
-		response = buildDeamonSetPatch(ar.Request.Object.Raw, patchAnnotations)
+		response = buildDeamonSetPatch(ar.Request.Object.Raw, newAnnotations)
 	case "StatefulSet":
-		response = buildStatefulSetPatch(ar.Request.Object.Raw, patchAnnotations)
+		response = buildStatefulSetPatch(ar.Request.Object.Raw, newAnnotations)
 	case "ReplicaSet":
-		response = buildReplicaSetPatch(ar.Request.Object.Raw, patchAnnotations)
+		response = buildReplicaSetPatch(ar.Request.Object.Raw, newAnnotations)
 	case "Pod":
-		response = buildPodPatch(ar.Request.Object.Raw, patchAnnotations)
+		response = buildPodPatch(ar.Request.Object.Raw, newAnnotations)
 	default:
 		response = &v1beta1.AdmissionResponse{
 			Allowed: true,

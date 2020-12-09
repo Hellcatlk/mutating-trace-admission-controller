@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func buildStatefulSetPatch(raw []byte, patchAnnotations map[string]string) *v1beta1.AdmissionResponse {
+func buildStatefulSetPatch(raw []byte, newAnnotations map[string]string) *v1beta1.AdmissionResponse {
 	var statefulSet appv1.StatefulSet
 	err := json.Unmarshal(raw, &statefulSet)
 	if err != nil {
@@ -22,7 +22,7 @@ func buildStatefulSetPatch(raw []byte, patchAnnotations map[string]string) *v1be
 		}
 	}
 
-	patchBytes, err := patch.EncodePatch(patch.BuildAnnotationsPatch(statefulSet.Annotations, patchAnnotations))
+	patchBytes, err := patch.Encode(patch.WithAnnotations(statefulSet.Annotations, newAnnotations))
 	if err != nil {
 		glog.Errorf("encode statefulset patch failed: %v", err)
 		return &v1beta1.AdmissionResponse{

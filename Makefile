@@ -21,7 +21,22 @@ remove:
 	@kubectl delete secret trace-context-injector-webhook-certs
 	@./tools/kustomize build deploy/base | kubectl delete -f -
 
-test-unit:
+.PHONY: test
+test: gofmt golint govet gosec unit
+
+gofmt:
+	./hack/gofmt.sh
+
+golint:
+	./hack/golint.sh
+
+govet:
+	go vet ./...
+
+gosec:
+	./hack/gosec.sh
+
+unit:
 	@go test ./... -coverprofile=cover.out
 	@go tool cover -html=cover.out -o coverage.html
 
