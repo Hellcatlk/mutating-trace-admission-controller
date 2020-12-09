@@ -28,11 +28,9 @@ Use our `kube-apiserver` and `kube-controller-manger` instead of them in cluster
 The included `Makefile` makes these steps straightforward and the available commands are as follows:
 
 - `make build`: build execute file.
-- `make docker`: build and load Docker image.
+- `make docker`: build and save Docker image.
 - `make install`: apply certificate configuration and deployment configuration to cluster for the mutating webhook.
 - `make remove`: delete resources associated with the mutating webhook from the active cluster.
-- `make test-unit`: run unit test.
-- `make test-webhook`: test webhook, use deployment deamonset statefulset replicaset and pod.
 - `make deployment`: apply and delete a deployment.
 - `make deamonset`: apply and delete a deamonset.
 - `make statefulset`: apply and delete a statefulset.
