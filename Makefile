@@ -25,16 +25,16 @@ remove:
 test: gofmt golint govet gosec unit
 
 gofmt:
-	./hack/gofmt.sh
+	@./hack/gofmt.sh
 
 golint:
-	./hack/golint.sh
+	@./hack/golint.sh
 
 govet:
-	go vet ./...
+	@go vet ./...
 
 gosec:
-	./hack/gosec.sh
+	@./hack/gosec.sh
 
 unit:
 	@go test ./... -coverprofile=cover.out

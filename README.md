@@ -1,3 +1,5 @@
+[![Continuous Integration](https://github.com/Hellcatlk/mutating-trace-admission-controller/workflows/Continuous%20Integration/badge.svg)](https://github.com/Hellcatlk/mutating-trace-admission-controller/actions)
+
 # Mutating Trace Admission Controller
 
 ---

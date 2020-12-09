@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestAnnotationsPatch(t *testing.T) {
+func TestWithAnnotations(t *testing.T) {
 	cases := []struct {
 		name     string
 		new      map[string]string
