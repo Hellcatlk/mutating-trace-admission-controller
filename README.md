@@ -2,11 +2,7 @@
 
 # Mutating Trace Admission Controller
 
----
-
 [Mutating admission controller](https://kubernetes.io/docs/reference/access-authn-authz/admission-controllers/#mutatingadmissionwebhook) that injects `initial trace id` and base64 encoded `span context` into the `trace.kubernetes.io.initial` and `trace.kubernetes.io.span.context` object annotation.
-
----
 
 ## Quick start
 
