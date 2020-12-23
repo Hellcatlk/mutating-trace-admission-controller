@@ -45,3 +45,4 @@ Currently, we support the following objects:
 - [x] StatefulSet
 - [x] ReplicaSet
 - [x] Pod
+- [x] Scale

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"k8s.io/api/admission/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1beta1"
 
 	"mutating-trace-admission-controller/pkg/util/trace"
 
@@ -18,7 +18,7 @@ const initialTraceIDAnnotationKey string = "trace.kubernetes.io.initial"
 const spanContextAnnotationKey string = "trace.kubernetes.io.span.context"
 
 // Build the response to inject the trace context into received object
-func Build(r *http.Request, ar *v1beta1.AdmissionReview) (response *v1beta1.AdmissionResponse) {
+func Build(r *http.Request, ar *admissionv1.AdmissionReview) (response *admissionv1.AdmissionResponse) {
 	fmt.Println("-------------------------------------")
 	fmt.Println(r.Header)
 	fmt.Println(ar.Request.Operation)
@@ -30,7 +30,7 @@ func Build(r *http.Request, ar *v1beta1.AdmissionReview) (response *v1beta1.Admi
 	spanContext := trace.SpanContextFromRequestHeader(r)
 
 	// only when CREATE we need add initTraceID
-	if ar.Request.Operation == v1beta1.Create {
+	if ar.Request.Operation == admissionv1.Create {
 		// get initTraceID from request header
 		initialTraceID = trace.InitialTraceIDFromRequestHeader(r)
 		if initialTraceID == "" {
@@ -42,7 +42,7 @@ func Build(r *http.Request, ar *v1beta1.AdmissionReview) (response *v1beta1.Admi
 	// build the annotations to patch
 	newAnnotations, err := buildAnnotations(initialTraceID, spanContext)
 	if len(newAnnotations) == 0 || err != nil {
-		return &v1beta1.AdmissionResponse{
+		return &admissionv1.AdmissionResponse{
 			UID:     ar.Request.UID,
 			Allowed: true,
 		}
@@ -59,8 +59,10 @@ func Build(r *http.Request, ar *v1beta1.AdmissionReview) (response *v1beta1.Admi
 		response = buildReplicaSetPatch(ar.Request.Object.Raw, newAnnotations)
 	case "Pod":
 		response = buildPodPatch(ar.Request.Object.Raw, newAnnotations)
+	case "Scale":
+		response = buildScalePatch(ar.Request.Object.Raw, newAnnotations)
 	default:
-		response = &v1beta1.AdmissionResponse{
+		response = &admissionv1.AdmissionResponse{
 			Allowed: true,
 		}
 	}

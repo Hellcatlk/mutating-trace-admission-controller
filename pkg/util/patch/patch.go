@@ -44,6 +44,26 @@ func WithAnnotations(old, new map[string]string) (patch []Operation) {
 	return
 }
 
+// WithAnnotationsValue build patch by annotations
+func WithAnnotationsValue(old, new map[string]string) (patchs []Operation) {
+	patch := Operation{
+		Op:    "replace",
+		Path:  "/metadata/annotations",
+		Value: nil,
+	}
+
+	for key, value := range new {
+		old[key] = value
+	}
+
+	if len(old) != 0 {
+		patch.Value = old
+		patchs = append(patchs, patch)
+	}
+
+	return
+}
+
 // Encode patch by json
 func Encode(patch []Operation) ([]byte, error) {
 	return json.Marshal(patch)

@@ -9,8 +9,7 @@ import (
 	"mutating-trace-admission-controller/pkg/response"
 
 	"github.com/golang/glog"
-	"k8s.io/api/admission/v1beta1"
-	admissionregistrationv1beta1 "k8s.io/api/admissionregistration/v1beta1"
+	admissionv1 "k8s.io/api/admission/v1beta1"
 	v1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -25,7 +24,7 @@ var (
 
 func init() {
 	_ = corev1.AddToScheme(runtimeScheme)
-	_ = admissionregistrationv1beta1.AddToScheme(runtimeScheme)
+	_ = admissionv1.AddToScheme(runtimeScheme)
 	_ = v1.AddToScheme(runtimeScheme)
 }
 
@@ -51,7 +50,7 @@ func (whsvr *WebhookServer) Serve(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// decode request body
-	ar := v1beta1.AdmissionReview{}
+	ar := admissionv1.AdmissionReview{}
 	_, _, err = deserializer.Decode(body, nil, &ar)
 	if err != nil {
 		glog.Errorf("decode request body failed: %v", err)
@@ -60,7 +59,7 @@ func (whsvr *WebhookServer) Serve(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// build response
-	admissionReview := v1beta1.AdmissionReview{}
+	admissionReview := admissionv1.AdmissionReview{}
 	admissionReview.Response = response.Build(r, &ar)
 
 	// marshal respson
