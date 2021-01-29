@@ -16,7 +16,7 @@ const defaultCertPath string = "/etc/webhook/certs/cert.pem"
 const defaultKeyPath string = "/etc/webhook/certs/key.pem"
 const defaultSpanContextAnnotationKey string = "trace.kubernetes.io/span/context"
 
-var config Config = Config{}
+var config Config
 
 // Get return parsed configuration
 func Get() Config {
@@ -26,24 +26,26 @@ func Get() Config {
 // Parse reads YAML config into config struct, if path is "",
 // use default config path("/etc/webhook/config/config.yaml").
 func Parse(path string) (Config, error) {
+	config = Config{}
+
 	if path == "" {
 		glog.Warningf("config path is empty, use default:: %v", defaultConfigPath)
 		path = defaultConfigPath
 	}
 
-	// read config file
+	// Read config file
 	configYaml, err := ioutil.ReadFile(filepath.Clean(path))
 	if err != nil {
 		return Config{}, fmt.Errorf("could not read YAML configuration file: %v", err)
 	}
 
-	// parse config yaml
+	// Parse config yaml
 	err = yaml.Unmarshal(configYaml, &config)
 	if err != nil {
 		return Config{}, fmt.Errorf("could not umarshal YAML configuration file: %v", err)
 	}
 
-	// validate config
+	// Validate config
 	if config.Trace.SampleRate < 0 || config.Trace.SampleRate > 1 {
 		return Config{}, errors.New("sampling rate must be between 0 and 1 inclusive")
 	}

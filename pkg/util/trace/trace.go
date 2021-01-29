@@ -36,26 +36,26 @@ func EncodedSpanContext(spanContext apitrace.SpanContext) (string, error) {
 	if reflect.DeepEqual(spanContext, apitrace.SpanContext{}) {
 		return "", fmt.Errorf("span context is nil")
 	}
-	// encode to byte
+	// Encode to byte
 	buffer := new(bytes.Buffer)
 	err := binary.Write(buffer, binary.LittleEndian, spanContext)
 	if err != nil {
 		return "", err
 	}
-	// encode to string
+	// Encode to string
 	return base64.StdEncoding.EncodeToString(buffer.Bytes()), nil
 }
 
 // DecodeSpanContext decode encodedSpanContext to spanContext
 func DecodeSpanContext(encodedSpanContext string) (apitrace.SpanContext, error) {
-	// decode to byte
+	// Decode to byte
 	byteList := make([]byte, base64.StdEncoding.DecodedLen(len(encodedSpanContext)))
 	l, err := base64.StdEncoding.Decode(byteList, []byte(encodedSpanContext))
 	if err != nil {
 		return apitrace.EmptySpanContext(), err
 	}
 	byteList = byteList[:l]
-	// decode to span context
+	// Decode to span context
 	buffer := bytes.NewBuffer(byteList)
 	spanContext := apitrace.SpanContext{}
 	err = binary.Read(buffer, binary.LittleEndian, &spanContext)

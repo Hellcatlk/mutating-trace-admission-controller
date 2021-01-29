@@ -21,7 +21,7 @@ func Build(r *http.Request, ar *admissionv1.AdmissionReview) (response *admissio
 	fmt.Println("-------------------------------------")
 
 	spanContext := trace.SpanContextFromRequestHeader(r)
-	// build the annotations to patch
+	// Build the annotations to patch
 	newAnnotations, err := buildAnnotations(spanContext)
 	if len(newAnnotations) == 0 || err != nil {
 		return &admissionv1.AdmissionResponse{

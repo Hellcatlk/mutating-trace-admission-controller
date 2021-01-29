@@ -35,13 +35,13 @@ type WebhookServer struct {
 
 // Serve http handler
 func (whsvr *WebhookServer) Serve(w http.ResponseWriter, r *http.Request) {
-	// verify the content type is accurate
+	// Verify the content type is accurate
 	if r.Header.Get("Content-Type") != "application/json" {
 		http.Error(w, "invalid Content-Type, expect `application/json`", http.StatusUnsupportedMediaType)
 		return
 	}
 
-	// read request body
+	// Read request body
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		glog.Errorf("read request body failed: %v", err)
@@ -49,7 +49,7 @@ func (whsvr *WebhookServer) Serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// decode request body
+	// Decode request body
 	ar := admissionv1.AdmissionReview{}
 	_, _, err = deserializer.Decode(body, nil, &ar)
 	if err != nil {
@@ -58,11 +58,11 @@ func (whsvr *WebhookServer) Serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// build response
+	// Build response
 	admissionReview := admissionv1.AdmissionReview{}
 	admissionReview.Response = response.Build(r, &ar)
 
-	// marshal respson
+	// Marshal respson
 	resp, err := json.Marshal(admissionReview)
 	if err != nil {
 		glog.Errorf("marshal respson failed: %v", err)
@@ -70,7 +70,7 @@ func (whsvr *WebhookServer) Serve(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// write respson
+	// Return respson
 	_, err = w.Write(resp)
 	if err != nil {
 		glog.Errorf("write respson failed: %v", err)

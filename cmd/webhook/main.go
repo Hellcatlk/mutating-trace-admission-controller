@@ -16,26 +16,26 @@ import (
 )
 
 func main() {
-	// read configuration location from command line arg
+	// Read configuration location from command line arg
 	var configPath string
 	flag.StringVar(&configPath, "configPath", "", "Path that points to the YAML configuration for this webhook.")
 	flag.Parse()
 
-	// parse configuration
+	// Parse configuration
 	cfg, err := config.Parse(configPath)
 	if err != nil {
 		glog.Errorf("parse configuration failed: %v", err)
 		return
 	}
 
-	// load certificates
+	// Load certificates
 	pair, err := cfg.LoadX509KeyPair()
 	if err != nil {
 		glog.Errorf("load X509 key pair failed: %v", err)
 		return
 	}
 
-	// config webhook server
+	// Config webhook server
 	whsvr := &server.WebhookServer{
 		Server: &http.Server{
 			Addr:      ":443",
@@ -46,7 +46,7 @@ func main() {
 	mux.HandleFunc("/mutate", whsvr.Serve)
 	whsvr.Server.Handler = mux
 
-	// begin webhook server
+	// Begin webhook server
 	go func() {
 		err := whsvr.Server.ListenAndServeTLS("", "")
 		if err != nil {
@@ -55,12 +55,12 @@ func main() {
 		}
 	}()
 
-	// listening OS shutdown singal
+	// Listening OS shutdown singal
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
 	<-signalChan
 
-	// shutdown webhook server
+	// Shutdown webhook server
 	err = whsvr.Server.Shutdown(context.Background())
 	if err != nil {
 		glog.Error(err)
