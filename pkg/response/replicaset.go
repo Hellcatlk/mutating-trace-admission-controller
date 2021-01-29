@@ -29,7 +29,7 @@ func buildReplicaSetPatch(raw []byte, newAnnotations map[string]string) *admissi
 		}
 	}
 
-	patchBytes, err := patch.Encode(patch.WithAnnotations(replicaSet.Annotations, newAnnotations))
+	patchBytes, err := patch.Encode(patch.WithAnnotations(replicaSet.GetAnnotations(), newAnnotations))
 	if err != nil {
 		glog.Errorf("encode replicaset patch failed: %v", err)
 		return &admissionv1.AdmissionResponse{

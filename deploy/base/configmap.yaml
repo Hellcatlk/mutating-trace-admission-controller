@@ -9,3 +9,4 @@ data:
       keyPath: /etc/webhook/certs/key.pem
     trace:
       sampleRate: 1.0
+      spanContextAnnotationKey: trace.kubernetes.io/span/context

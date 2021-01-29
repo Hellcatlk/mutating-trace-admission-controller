@@ -14,27 +14,18 @@ import (
 const defaultConfigPath string = "/etc/webhook/config/config.yaml"
 const defaultCertPath string = "/etc/webhook/certs/cert.pem"
 const defaultKeyPath string = "/etc/webhook/certs/key.pem"
+const defaultSpanContextAnnotationKey string = "trace.kubernetes.io/span/context"
 
-// Config represents all config we need to initialize the webhook server
-type Config struct {
-	Certificate Certificate `yaml:"certificate"`
-	Trace       Trace       `yaml:"trace"`
+var config Config = Config{}
+
+// Get return parsed configuration
+func Get() Config {
+	return config
 }
 
-// Certificate is the configuration for the certificate
-type Certificate struct {
-	CertPath string `yaml:"certPath"`
-	KeyPath  string `yaml:"keyPath"`
-}
-
-// Trace is the configuration for the trace context added to pods
-type Trace struct {
-	SampleRate float64 `yaml:"sampleRate"`
-}
-
-// ParseConfig reads YAML config into config struct, if path is "",
+// Parse reads YAML config into config struct, if path is "",
 // use default config path("/etc/webhook/config/config.yaml").
-func ParseConfig(path string) (Config, error) {
+func Parse(path string) (Config, error) {
 	if path == "" {
 		glog.Warningf("config path is empty, use default:: %v", defaultConfigPath)
 		path = defaultConfigPath
@@ -47,7 +38,6 @@ func ParseConfig(path string) (Config, error) {
 	}
 
 	// parse config yaml
-	var config Config
 	err = yaml.Unmarshal(configYaml, &config)
 	if err != nil {
 		return Config{}, fmt.Errorf("could not umarshal YAML configuration file: %v", err)
@@ -56,6 +46,10 @@ func ParseConfig(path string) (Config, error) {
 	// validate config
 	if config.Trace.SampleRate < 0 || config.Trace.SampleRate > 1 {
 		return Config{}, errors.New("sampling rate must be between 0 and 1 inclusive")
+	}
+	if config.Trace.SpanContextAnnotationKey == "" {
+		glog.Warningf("span context annotationKey is empty, use default: %v", defaultSpanContextAnnotationKey)
+		config.Trace.SpanContextAnnotationKey = defaultSpanContextAnnotationKey
 	}
 	if config.Certificate.CertPath == "" {
 		glog.Warningf("cert path is empty, use default: %v", defaultCertPath)
@@ -73,6 +67,6 @@ func ParseConfig(path string) (Config, error) {
 // The files must contain PEM encoded data.
 // The certificate file may contain intermediate certificates following the leaf certificate to form a certificate chain.
 // On successful return, Certificate.Leaf will be nil because the parsed form of the certificate is not retained.
-func (config *Config) LoadX509KeyPair() (tls.Certificate, error) {
-	return tls.LoadX509KeyPair(config.Certificate.CertPath, config.Certificate.KeyPath)
+func (c *Config) LoadX509KeyPair() (tls.Certificate, error) {
+	return tls.LoadX509KeyPair(c.Certificate.CertPath, c.Certificate.KeyPath)
 }

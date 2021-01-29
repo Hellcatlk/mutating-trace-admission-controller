@@ -6,16 +6,11 @@ import (
 
 	admissionv1 "k8s.io/api/admission/v1beta1"
 
+	"mutating-trace-admission-controller/pkg/config"
 	"mutating-trace-admission-controller/pkg/util/trace"
 
 	apitrace "go.opentelemetry.io/otel/api/trace"
 )
-
-// avoid use char `/` in string
-const initialTraceIDAnnotationKey string = "trace.kubernetes.io.initial"
-
-// avoid use char `/` in string
-const spanContextAnnotationKey string = "trace.kubernetes.io.span.context"
 
 // Build the response to inject the trace context into received object
 func Build(r *http.Request, ar *admissionv1.AdmissionReview) (response *admissionv1.AdmissionResponse) {
@@ -25,22 +20,9 @@ func Build(r *http.Request, ar *admissionv1.AdmissionReview) (response *admissio
 	fmt.Println(ar.Request.Kind.Kind)
 	fmt.Println("-------------------------------------")
 
-	// extract span context from request
-	var initialTraceID string = ""
 	spanContext := trace.SpanContextFromRequestHeader(r)
-
-	// only when CREATE we need add initTraceID
-	if ar.Request.Operation == admissionv1.Create {
-		// get initTraceID from request header
-		initialTraceID = trace.InitialTraceIDFromRequestHeader(r)
-		if initialTraceID == "" {
-			// FIXME: Use request uid for initial trace id
-			initialTraceID = string(ar.Request.UID)
-		}
-	}
-
 	// build the annotations to patch
-	newAnnotations, err := buildAnnotations(initialTraceID, spanContext)
+	newAnnotations, err := buildAnnotations(spanContext)
 	if len(newAnnotations) == 0 || err != nil {
 		return &admissionv1.AdmissionResponse{
 			UID:     ar.Request.UID,
@@ -59,8 +41,6 @@ func Build(r *http.Request, ar *admissionv1.AdmissionReview) (response *admissio
 		response = buildReplicaSetPatch(ar.Request.Object.Raw, newAnnotations)
 	case "Pod":
 		response = buildPodPatch(ar.Request.Object.Raw, newAnnotations)
-	case "Scale":
-		response = buildScalePatch(ar.Request.Object.Raw, newAnnotations)
 	default:
 		response = &admissionv1.AdmissionResponse{
 			Allowed: true,
@@ -72,18 +52,13 @@ func Build(r *http.Request, ar *admissionv1.AdmissionReview) (response *admissio
 }
 
 // buildAnnotations create a annotation with initTraceID and span
-func buildAnnotations(initTraceID string, spanContext apitrace.SpanContext) (map[string]string, error) {
+func buildAnnotations(spanContext apitrace.SpanContext) (map[string]string, error) {
 	encodedSpanContext, err := trace.EncodedSpanContext(spanContext)
 	if err != nil {
 		return nil, err
 	}
-	if initTraceID == "" {
-		return map[string]string{
-			spanContextAnnotationKey: encodedSpanContext,
-		}, nil
-	}
+
 	return map[string]string{
-		initialTraceIDAnnotationKey: initTraceID,
-		spanContextAnnotationKey:    encodedSpanContext,
+		config.Get().Trace.SpanContextAnnotationKey: encodedSpanContext,
 	}, nil
 }

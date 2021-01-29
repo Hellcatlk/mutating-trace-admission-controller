@@ -22,7 +22,7 @@ func buildStatefulSetPatch(raw []byte, newAnnotations map[string]string) *admiss
 		}
 	}
 
-	patchBytes, err := patch.Encode(patch.WithAnnotations(statefulSet.Annotations, newAnnotations))
+	patchBytes, err := patch.Encode(patch.WithAnnotations(statefulSet.GetAnnotations(), newAnnotations))
 	if err != nil {
 		glog.Errorf("encode statefulset patch failed: %v", err)
 		return &admissionv1.AdmissionResponse{

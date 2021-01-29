@@ -22,7 +22,7 @@ func buildPodPatch(raw []byte, newAnnotations map[string]string) *admissionv1.Ad
 		}
 	}
 
-	patchBytes, err := patch.Encode(patch.WithAnnotations(pod.Annotations, newAnnotations))
+	patchBytes, err := patch.Encode(patch.WithAnnotations(pod.GetAnnotations(), newAnnotations))
 	if err != nil {
 		glog.Errorf("encode pod patch failed: %v", err)
 		return &admissionv1.AdmissionResponse{

@@ -20,7 +20,7 @@ func TestWithAnnotations(t *testing.T) {
 			},
 			expected: []Operation{
 				{
-					Op:   "add",
+					Op:   "replace",
 					Path: "/metadata/annotations",
 					Value: map[string]string{
 						"k1": "1",
@@ -29,31 +29,30 @@ func TestWithAnnotations(t *testing.T) {
 				},
 			},
 		},
-		// {
-		// 	name: "old is empty",
-		// 	old:  map[string]string{},
-		// 	new: map[string]string{
-		// 		"k1": "1",
-		// 		"k2": "2",
-		// 	},
-		// 	expected: []Operation{
-		// 		{
-		// 			Op:    "add",
-		// 			Path:  "/metadata/annotations/k1",
-		// 			Value: "1",
-		// 		},
-		// 		{
-		// 			Op:    "add",
-		// 			Path:  "/metadata/annotations/k2",
-		// 			Value: "2",
-		// 		},
-		// 	},
-		// },
+		{
+			name: "old is empty",
+			old:  map[string]string{},
+			new: map[string]string{
+				"k1": "1",
+				"k2": "2",
+			},
+			expected: []Operation{
+				{
+					Op:   "replace",
+					Path: "/metadata/annotations",
+					Value: map[string]string{
+						"k1": "1",
+						"k2": "2",
+					},
+				},
+			},
+		},
 		{
 			name: "old have same key with new",
 			old: map[string]string{
 				"k1": "0",
 				"k2": "2",
+				"k3": "3",
 			},
 			new: map[string]string{
 				"k1": "1",
@@ -61,9 +60,13 @@ func TestWithAnnotations(t *testing.T) {
 			},
 			expected: []Operation{
 				{
-					Op:    "replace",
-					Path:  "/metadata/annotations/k1",
-					Value: "1",
+					Op:   "replace",
+					Path: "/metadata/annotations",
+					Value: map[string]string{
+						"k1": "1",
+						"k2": "2",
+						"k3": "3",
+					},
 				},
 			},
 		},

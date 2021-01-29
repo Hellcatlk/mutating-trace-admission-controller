@@ -1,6 +1,7 @@
 package response
 
 import (
+	"mutating-trace-admission-controller/pkg/config"
 	"reflect"
 	"testing"
 
@@ -10,27 +11,23 @@ import (
 func TestBuildAnnotations(t *testing.T) {
 	cases := []struct {
 		name          string
-		initTraceID   string
 		spanContext   apitrace.SpanContext
 		expected      map[string]string
 		expectedError bool
 	}{
 		{
-			name:        "both",
-			initTraceID: "1234",
+			name: "both",
 			spanContext: apitrace.SpanContext{
 				TraceID:    [16]byte{1, 2, 3},
 				SpanID:     [8]byte{4, 5},
 				TraceFlags: 1,
 			},
 			expected: map[string]string{
-				initialTraceIDAnnotationKey: "1234",
-				spanContextAnnotationKey:    "AQIDAAAAAAAAAAAAAAAAAAQFAAAAAAAAAQ==",
+				config.Get().Trace.SpanContextAnnotationKey: "AQIDAAAAAAAAAAAAAAAAAAQFAAAAAAAAAQ==",
 			},
 		},
 		{
 			name:          "only init trace id",
-			initTraceID:   "1234",
 			expectedError: true,
 		},
 		{
@@ -41,7 +38,7 @@ func TestBuildAnnotations(t *testing.T) {
 				TraceFlags: 1,
 			},
 			expected: map[string]string{
-				spanContextAnnotationKey: "AQIDAAAAAAAAAAAAAAAAAAQFAAAAAAAAAQ==",
+				config.Get().Trace.SpanContextAnnotationKey: "AQIDAAAAAAAAAAAAAAAAAAQFAAAAAAAAAQ==",
 			},
 		},
 		{
@@ -52,7 +49,7 @@ func TestBuildAnnotations(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			got, err := buildAnnotations(c.initTraceID, c.spanContext)
+			got, err := buildAnnotations(c.spanContext)
 			if (err != nil) != c.expectedError {
 				t.Errorf("got unexpected error: %v", err)
 			}

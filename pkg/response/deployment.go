@@ -22,7 +22,7 @@ func buildDeploymentPatch(raw []byte, newAnnotations map[string]string) *admissi
 		}
 	}
 
-	patchBytes, err := patch.Encode(patch.WithAnnotations(deployment.Annotations, newAnnotations))
+	patchBytes, err := patch.Encode(patch.WithAnnotations(deployment.GetAnnotations(), newAnnotations))
 	if err != nil {
 		glog.Errorf("encode deployment patch failed: %v", err)
 		return &admissionv1.AdmissionResponse{

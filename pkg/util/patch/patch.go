@@ -1,6 +1,8 @@
 package patch
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 // Operation ...
 type Operation struct {
@@ -10,56 +12,20 @@ type Operation struct {
 }
 
 // WithAnnotations build patch by annotations
-func WithAnnotations(old, new map[string]string) (patch []Operation) {
-	var (
-		patchAdd Operation = Operation{
-			Op:    "add",
-			Path:  "/metadata/annotations",
-			Value: make(map[string]string, 0),
-		}
-	)
-
-	for key, value := range new {
-		if old == nil {
-			patchAdd.Value.(map[string]string)[key] = value
-		} else if old[key] == "" {
-			patch = append(patch, Operation{
-				Op:    "add",
-				Path:  "/metadata/annotations/" + key,
-				Value: value,
-			})
-		} else if old[key] != value {
-			patch = append(patch, Operation{
-				Op:    "replace",
-				Path:  "/metadata/annotations/" + key,
-				Value: value,
-			})
-		}
+func WithAnnotations(old, new map[string]string) (patchs []Operation) {
+	if old == nil {
+		old = make(map[string]string)
 	}
-
-	if len(patchAdd.Value.(map[string]string)) != 0 {
-		patch = append(patch, patchAdd)
-	}
-
-	return
-}
-
-// WithAnnotationsValue build patch by annotations
-func WithAnnotationsValue(old, new map[string]string) (patchs []Operation) {
 	patch := Operation{
 		Op:    "replace",
 		Path:  "/metadata/annotations",
-		Value: nil,
+		Value: old,
 	}
 
 	for key, value := range new {
-		old[key] = value
+		patch.Value.(map[string]string)[key] = value
 	}
-
-	if len(old) != 0 {
-		patch.Value = old
-		patchs = append(patchs, patch)
-	}
+	patchs = append(patchs, patch)
 
 	return
 }

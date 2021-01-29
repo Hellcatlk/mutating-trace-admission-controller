@@ -22,7 +22,7 @@ func main() {
 	flag.Parse()
 
 	// parse configuration
-	cfg, err := config.ParseConfig(configPath)
+	cfg, err := config.Parse(configPath)
 	if err != nil {
 		glog.Errorf("parse configuration failed: %v", err)
 		return

@@ -23,7 +23,8 @@ func TestParseConfig(t *testing.T) {
 					KeyPath:  "/home/certs/key.pem",
 				},
 				Trace: Trace{
-					SampleRate: 1.0,
+					SampleRate:               1.0,
+					SpanContextAnnotationKey: "trace.kubernetes.io/span/context",
 				},
 			},
 		},
@@ -33,6 +34,10 @@ func TestParseConfig(t *testing.T) {
 				Certificate: Certificate{
 					CertPath: "/etc/webhook/certs/cert.pem",
 					KeyPath:  "/etc/webhook/certs/key.pem",
+				},
+				Trace: Trace{
+					SampleRate:               0,
+					SpanContextAnnotationKey: "trace.kubernetes.io/span/context",
 				},
 			},
 		},
@@ -44,7 +49,7 @@ func TestParseConfig(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.path, func(t *testing.T) {
-			got, err := ParseConfig(c.path)
+			got, err := Parse(c.path)
 			if (err != nil) != c.expectedError {
 				t.Errorf("got unexpected error: %v", err)
 			}

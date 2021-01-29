@@ -22,7 +22,7 @@ func buildDeamonSetPatch(raw []byte, newAnnotations map[string]string) *admissio
 		}
 	}
 
-	patchBytes, err := patch.Encode(patch.WithAnnotations(deamonSet.Annotations, newAnnotations))
+	patchBytes, err := patch.Encode(patch.WithAnnotations(deamonSet.GetAnnotations(), newAnnotations))
 	if err != nil {
 		glog.Errorf("encode deamonset patch failed: %v", err)
 		return &admissionv1.AdmissionResponse{
