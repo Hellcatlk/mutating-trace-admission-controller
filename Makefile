@@ -27,14 +27,14 @@ test: gofmt golint govet gosec unit
 gofmt:
 	@./hack/gofmt.sh
 
-golint:
-	@./hack/golint.sh
+golint: bin/golangci-lint
+	@./bin/golangci-lint run ./... --timeout=10m
 
 govet:
 	@go vet ./...
 
-gosec:
-	@./hack/gosec.sh
+gosec: bin/gosec
+	@./bin/gosec -quiet ./...
 
 unit:
 	@go test ./... -coverprofile=cover.out
@@ -80,3 +80,19 @@ clean:
 	@rm -f deploy/base/mutatingwebhook-ca-bundle.yaml
 	@rm -f cover*
 	@docker rmi -f $(IMAGE)
+
+# Install kustomize
+bin/kustomize:
+	./hack/install_kustomize.sh
+
+# Install controller-gen
+bin/controller-gen:
+	./hack/install_controller-gen.sh
+
+# Install golangci-lint
+bin/golangci-lint:
+	./hack/install_golangci-lint.sh
+
+# Install gosec
+bin/gosec:
+	./hack/install_gosec.sh
