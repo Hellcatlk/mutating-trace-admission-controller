@@ -39,7 +39,7 @@ func main() {
 	whsvr := &server.WebhookServer{
 		Server: &http.Server{
 			Addr:      ":443",
-			TLSConfig: &tls.Config{Certificates: []tls.Certificate{pair}},
+			TLSConfig: &tls.Config{Certificates: []tls.Certificate{pair}, MinVersion: tls.VersionTLS13},
 		},
 	}
 	mux := http.NewServeMux()
