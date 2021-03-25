@@ -76,6 +76,4 @@ func (whsvr *WebhookServer) Serve(w http.ResponseWriter, r *http.Request) {
 		glog.Errorf("write respson failed: %v", err)
 		http.Error(w, fmt.Sprintf("could not write response: %v", err), http.StatusInternalServerError)
 	}
-
-	return
 }
