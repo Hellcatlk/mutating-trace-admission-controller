@@ -1,9 +1,12 @@
 IMAGE=trace-context-injector:v1
 DELAY=1
 
+GOOS=$(shell go env GOOS)
+GOARCH=$(shell go env GOARCH)
+
 .PHONY: build
 build:
-	CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o bin/webhook cmd/webhook/main.go
+	CGO_ENABLED=0 GOOS=${GOOS} GOARCH=${GOARCH} GO111MODULE=on go build -a -o bin/webhook ./cmd/webhook/main.go
 
 docker: build
 	docker rmi -f $(IMAGE)
